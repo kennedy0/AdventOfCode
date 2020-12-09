@@ -22,13 +22,29 @@ class Program:
         self.address = 0
         self.accumulator = 0
         self.instructions = []
-        self.history = []
+        self.visited_addresses = []
+
+        self.operation_dispatch = {
+            'acc': self.acc,
+            'jmp': self.jmp,
+            'nop': self.nop,
+        }
+
+    def acc(self, argument: int) -> int:
+        self.accumulator += argument
+        return 1
+
+    def jmp(self, argument: int) -> int:
+        return argument
+
+    def nop(self, argument: int) -> int:
+        return 1
 
     @classmethod
     def from_file(cls, file: str) -> Program:
-        prog = Program()
-        prog.load_instructions(file=file)
-        return prog
+        p = Program()
+        p.load_instructions(file=file)
+        return p
 
     def load_instructions(self, file: str):
         self.instructions = []
@@ -38,18 +54,28 @@ class Program:
     def reset(self):
         self.address = 0
         self.accumulator = 0
-        self.history = []
+        self.visited_addresses = []
+
+    def get_instruction(self) -> Instruction:
+        if self.address in self.visited_addresses:
+            raise RecursionError(f"Address {self.address} has been visited already.")
+        else:
+            self.visited_addresses.insert(0, self.address)
+            return self.instructions[self.address]
+
+    def modify_instruction(self, address: int, operation: str = None, argument: str = None):
+        if operation is not None:
+            self.instructions[address].operation = operation
+        if argument is not None:
+            self.instructions[address].argument = argument
 
     def step(self):
-        return
+        instruction = self.get_instruction()
+        op = self.operation_dispatch[instruction.operation]
+        result = op(argument=instruction.argument)  # noqa
+        self.address += result
 
     def run(self):
         self.reset()
-
-        while address < len(self.instructions):
-            instruction = self.get_instruction(address)
-            op = self.operation_dispatch[instruction.operation]
-            offset = op(argument=instruction.argument)
-            address += offset
-
-        print(f"Program terminated. Accumulator is {self.accumulator}")
+        while self.address < len(self.instructions):
+            self.step()
