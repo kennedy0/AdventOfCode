@@ -4,6 +4,7 @@ from itertools import combinations
 from typing import List, Tuple
 
 from utils.input_file import file_path_from_args
+from utils.math_utils import find_terms
 from utils.read_lines import read_lines
 
 
@@ -32,14 +33,6 @@ def is_int(string: str) -> bool:
         return True
     except Exception:
         return False
-
-
-def find_terms(terms: List[int], sum_: int, term_count: int) -> Tuple[int, ...] or None:
-    """ Find terms from a list that equal the sum. """
-    for combination in combinations(terms, term_count):
-        if sum(combination) == sum_:
-            return combination
-    return None
 
 
 if __name__ == "__main__":
