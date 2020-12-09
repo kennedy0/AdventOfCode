@@ -1,8 +1,13 @@
-import os
+from __future__ import annotations
+
 import re
+import sys
 
 from collections import namedtuple
 from typing import List
+
+from utils.input_file import file_path_from_args
+from utils.read_lines import read_lines
 
 
 Contents = namedtuple("Rule", "num name")
@@ -10,6 +15,31 @@ Contents = namedtuple("Rule", "num name")
 
 name_re = re.compile(r"(?P<name>.+) bag(?:s)?", re.I)
 contains_re = re.compile(r"(?P<num>[\d]+)\s(?P<name>.+?)\sbag(?:s)?", re.I)
+
+
+class Bags:
+    def __init__(self, input_file: str):
+        self._bags = []
+
+        self._parse_input_file(file=input_file)
+
+    def _parse_input_file(self, file: str):
+        for line in read_lines(file):
+            self._bags.append(Bag(rule_text=line))
+
+    @property
+    def all_bags(self) -> List[Bag]:
+        for bag in self._bags:
+            yield bag
+
+    def find(self, name: str) -> Bag or None:
+        for bag in self.all_bags:
+            if bag.name == name:
+                return bag
+        return None
+
+
+BAGS = None
 
 
 class Bag:
@@ -32,41 +62,27 @@ class Bag:
                 self.contains.append(Contents(num, name))
 
 
-def get_bags(input_file: str) -> List[Bag]:
-    bags = []
-    with open(input_file, 'r') as fp:
-        for line in fp.readlines():
-            bags.append(Bag(rule_text=line.strip()))
-    return bags
+def main(input_file: str) -> int:
+    global BAGS
+    BAGS = Bags(input_file=input_file)
 
-
-BAGS = get_bags(input_file=os.path.join(os.path.dirname(__file__), "input.txt"))
-
-
-def main():
     count = 0
-    for bag in BAGS:
+    for bag in BAGS.all_bags:
         if can_contain(bag, "shiny gold"):
             count += 1
 
     print(f"{count} bags can contain a shiny gold bag.")
 
-    children = count_children(find_bag("shiny gold"))
+    children = count_children(BAGS.find("shiny gold"))
     print(f"Shiny gold bag can hold {children} other bags.")
-
-
-def find_bag(name: str) -> Bag or None:
-    for bag in BAGS:
-        if bag.name == name:
-            return bag
-    return None
+    return 0
 
 
 def can_contain(bag: Bag, name: str) -> bool:
     for contents in bag.contains:  # type: Contents
         if contents.name == name:
             return True
-        elif can_contain(bag=find_bag(contents.name), name=name):
+        elif can_contain(bag=BAGS.find(contents.name), name=name):
             return True
     return False
 
@@ -74,9 +90,9 @@ def can_contain(bag: Bag, name: str) -> bool:
 def count_children(bag: Bag) -> int:
     children = 0
     for contents in bag.contains:  # type: Contents
-        children += (contents.num * (count_children(bag=find_bag(contents.name)) + 1))
+        children += (contents.num * (count_children(bag=BAGS.find(contents.name)) + 1))
     return children
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main(file_path_from_args()))

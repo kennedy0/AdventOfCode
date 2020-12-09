@@ -1,6 +1,8 @@
-import os
-
+import sys
 from typing import List
+
+from utils.input_file import file_path_from_args
+from utils.read_lines import read_lines
 
 
 class Passport:
@@ -105,32 +107,30 @@ class Passport:
         return True
 
 
-def main():
-    input_file = os.path.join(os.path.dirname(__file__), "input.txt")
-
-    passports = get_passport_list(input_file=input_file)
+def main(input_file: str) -> int:
+    passports = get_passport_list(file=input_file)
     valid_passports = [p for p in passports if p.valid]
     print(f"Found {len(valid_passports)} valid passports (out of {len(passports)})")
+    return 0
 
 
-def get_passport_list(input_file: str) -> List[Passport]:
+def get_passport_list(file: str) -> List[Passport]:
     passports = list()
 
-    with open(input_file, 'r') as fp:
-        # Group lines
-        line_groups = []
-        text_group = []
-        for line in fp.readlines():
-            text = line.strip()
-            if text == "":
-                line_groups.append(text_group)
-                text_group = []
-                continue
-            else:
-                text_group.append(text)
-        if len(text_group):
-            # Last group
+    # Group lines
+    line_groups = []
+    text_group = []
+    for line in read_lines(file_path=file):
+        if line == "":
             line_groups.append(text_group)
+            text_group = []
+            continue
+        else:
+            text_group.append(line)
+
+    if len(text_group):
+        # Last group
+        line_groups.append(text_group)
 
     for text_group in line_groups:
         passport_data_text = " ".join(text_group)
@@ -140,4 +140,4 @@ def get_passport_list(input_file: str) -> List[Passport]:
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main(file_path_from_args()))

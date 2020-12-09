@@ -1,7 +1,10 @@
-import os
 import re
+import sys
 from enum import Enum
 from typing import List
+
+from utils.input_file import file_path_from_args
+from utils.read_lines import read_lines
 
 
 password_re = re.compile(
@@ -58,21 +61,17 @@ class Password:
             return False
 
 
-def main(policy: Policy):
-    input_file = os.path.join(os.path.dirname(__file__), "input.txt")
-    passwords = get_password_list(input_file=input_file, policy=policy)
-    valid_passwords = [p for p in passwords if p.valid]
-    print(f"{len(valid_passwords)} out of {len(passwords)} are valid (using policy: {policy.value})")
-
-
-def get_password_list(input_file: str, policy: Policy) -> List[Password]:
-    passwords = list()
-    with open(input_file, 'r') as fp:
-        for line in fp.readlines():
+def main(input_file: str) -> int:
+    for policy in Policy:
+        passwords = []
+        for line in read_lines(input_file):
             passwords.append(Password(text=line, policy=policy))
-    return passwords
+
+        valid_passwords = [p for p in passwords if p.valid]
+        print(f"{len(valid_passwords)} out of {len(passwords)} are valid (using policy: {policy.value})")
+
+    return 0
 
 
 if __name__ == "__main__":
-    main(policy=Policy.Count)
-    main(policy=Policy.Position)
+    sys.exit(main(input_file=file_path_from_args()))

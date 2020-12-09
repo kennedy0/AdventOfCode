@@ -1,4 +1,7 @@
-import os
+import sys
+
+from utils.input_file import file_path_from_args
+from utils.read_lines import read_lines
 
 
 class Instruction:
@@ -48,9 +51,8 @@ class Program:
         self.parse_instructions(instruction_file)
 
     def parse_instructions(self, file: str):
-        with open(file, 'r') as fp:
-            for line in fp.readlines():
-                self.instructions.append(Instruction(line.strip()))
+        for line in read_lines(file):
+            self.instructions.append(Instruction(line))
         self._original_instructions = self.instructions
 
     def reset_instructions(self):
@@ -93,8 +95,8 @@ class Program:
         print(f"Program terminated. Accumulator is {self.accumulator}")
 
 
-def main():
-    prog = Program(instruction_file=os.path.join(os.path.dirname(__file__), "input.txt"))
+def main(input_file: str) -> int:
+    prog = Program(instruction_file=input_file)
     try:
         prog.run()
     except RecursionError as e:
@@ -115,7 +117,8 @@ def main():
                     print(f"Modification failed: {e}")
                     print("Resetting instructions...\n")
                     prog.reset_instructions()
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main(file_path_from_args()))
