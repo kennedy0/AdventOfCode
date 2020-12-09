@@ -5,15 +5,15 @@ from utils.program import Instruction, Program
 
 
 def main(input_file: str) -> int:
-    prog = Program.from_file(file=input_file)
+    program = Program.from_file(file=input_file)
 
     try:
-        prog.run()
+        program.run()
     except RecursionError as e:
         print(f"RecursionError: {e}")
-        print(f"Accumulator: {prog.accumulator}")
-        repair_program(prog)
-        print(f"Accumulator: {prog.accumulator}")
+        print(f"Accumulator: {program.accumulator}")
+        repair_program(program)
+        print(f"Accumulator: {program.accumulator}")
     return 0
 
 
