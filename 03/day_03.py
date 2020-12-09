@@ -1,8 +1,10 @@
 import math
-import os
-
+import sys
 from collections import namedtuple
 from typing import List
+
+from utils.input_file import file_path_from_args
+from utils.read_lines import read_lines
 
 
 Vector2 = namedtuple("Vector2", "x y")
@@ -17,15 +19,13 @@ class TreeMap:
         self.width = 0
         self.path = ""
 
-        self._parse_input_file(input_file)
+        self._parse_input_file(file=input_file)
 
-    def _parse_input_file(self, input_file: str):
-        with open(input_file, 'r') as fp:
-            for line in fp.readlines():
-                row = line.strip()
-                self.rows.append(row)
-                if len(row) > self.width:
-                    self.width = len(row)
+    def _parse_input_file(self, file: str):
+        for line in read_lines(file):
+            self.rows.append(line)
+            if len(line) > self.width:
+                self.width = len(line)
 
     def get_square(self, row: List[str], position: int):
         index = position
@@ -59,25 +59,9 @@ class TreeMap:
         return tree_count
 
 
-def get_tree_count(slope: Vector2) -> int:
-    input_file = os.path.join(os.path.dirname(__file__), "input.txt")
-    output_file = os.path.join(os.path.dirname(__file__), f"output_x{slope.x}_y{slope.y}.txt")
-
-    try:
-        os.unlink(output_file)
-    except OSError:
-        pass
-
+def main(input_file: str) -> int:
     tree_map = TreeMap(input_file=input_file)
-    trees = tree_map.tree_count(start_position=0, slope=slope)
 
-    with open(output_file, 'w') as fp:
-        fp.write(tree_map.path)
-
-    return trees
-
-
-def main():
     slopes = [
         Vector2(1, 1),
         Vector2(3, 1),
@@ -88,13 +72,14 @@ def main():
 
     results = list()
     for slope in slopes:
-        trees = get_tree_count(slope=slope)
-        results.append(trees)
-        print(f"Slope ({slope.x}, {slope.y}) Encountered {trees} trees.")
+        tree_count = tree_map.tree_count(start_position=0, slope=slope)
+        results.append(tree_count)
+        print(f"Slope ({slope.x}, {slope.y}) Encountered {tree_count} trees.")
 
     results_str = " * ".join(str(r) for r in results)
     print(f"{results_str} = {math.prod(results)}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main(file_path_from_args()))

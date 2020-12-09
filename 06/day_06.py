@@ -1,11 +1,13 @@
-import os
+import sys
 from typing import List
 
+from utils.input_file import file_path_from_args
+from utils.lists import intersect_lists, union_lists
+from utils.read_lines import read_lines
 
-def main():
-    input_file = os.path.join(os.path.dirname(__file__), "input.txt")
 
-    groups = get_groups(input_file=input_file)
+def main(input_file: str) -> int:
+    groups = split_list(lst=list(read_lines(input_file)), separator="")
 
     union_count = 0
     for group in groups:
@@ -19,13 +21,7 @@ def main():
 
     print(f"Sum of all counts is {union_count} (Union)")
     print(f"Sum of all counts is {intersection_count} (Intersection)")
-
-
-def get_groups(input_file: str) -> List[List]:
-    with open(input_file, 'r') as fp:
-        lines = [line.strip() for line in fp.readlines()]
-
-    return split_list(lst=lines, separator="")
+    return 0
 
 
 def split_list(lst: list, separator: str) -> List[List]:
@@ -43,15 +39,5 @@ def split_list(lst: list, separator: str) -> List[List]:
     return grouped_list
 
 
-def union_lists(*lists: List):
-    sets = [set(lst) for lst in lists]
-    return list(sets[0].union(*sets[1:]))
-
-
-def intersect_lists(*lists: List):
-    sets = [set(lst) for lst in lists]
-    return list(sets[0].intersection(*sets[1:]))
-
-
 if __name__ == "__main__":
-    main()
+    sys.exit(main(file_path_from_args()))

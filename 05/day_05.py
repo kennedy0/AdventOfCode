@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-import os
-
+import sys
 from enum import Enum
 from typing import List
+
+from utils.input_file import file_path_from_args
+from utils.read_lines import read_lines
 
 
 class Direction(Enum):
@@ -87,15 +89,10 @@ class BoardingPass:
         self.column = col[0]
 
 
-def main():
-    input_file = os.path.join(os.path.dirname(__file__), "input.txt")
-    boarding_passes = get_boarding_passes(input_file=input_file)
-
-    highest_id = 0
-    for bp in boarding_passes:
-        print(bp)
-        if bp.seat_id > highest_id:
-            highest_id = bp.seat_id
+def main(input_file: str) -> int:
+    boarding_passes = []
+    for line in read_lines(input_file):
+        boarding_passes.append(BoardingPass(text=line))
 
     seat_ids = sorted([bp.seat_id for bp in boarding_passes])
     print(f"Highest seat ID is {max(seat_ids)}")
@@ -104,15 +101,8 @@ def main():
         if seat_id + 1 not in seat_ids:
             print(f"Seat ID {seat_id + 1} is missing.")
             break
-
-
-def get_boarding_passes(input_file: str) -> List[BoardingPass]:
-    boarding_passes = []
-    with open(input_file, 'r') as fp:
-        for line in fp.readlines():
-            boarding_passes.append(BoardingPass(text=line.strip()))
-    return boarding_passes
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main(file_path_from_args()))
