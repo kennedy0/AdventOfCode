@@ -8,6 +8,7 @@ from typing import List
 
 from utils.input_file import file_path_from_args
 from utils.read_lines import read_lines
+from utils.timer import Timer
 
 
 Contents = namedtuple("Rule", "num name")
@@ -67,10 +68,10 @@ def main(input_file: str) -> int:
     BAGS = Bags(input_file=input_file)
 
     count = 0
-    for bag in BAGS.all_bags:
-        if can_contain(bag, "shiny gold"):
-            count += 1
-
+    with Timer(timer_name="Bag count"):
+        for bag in BAGS.all_bags:
+            if can_contain(bag, "shiny gold"):
+                count += 1
     print(f"{count} bags can contain a shiny gold bag.")
 
     children = count_children(BAGS.find("shiny gold"))
