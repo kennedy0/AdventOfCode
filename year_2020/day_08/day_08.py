@@ -1,6 +1,7 @@
 import sys
 
 from utils.input_file import file_path_from_args
+from utils.print_fn import print
 from utils.program import Instruction, Program
 
 

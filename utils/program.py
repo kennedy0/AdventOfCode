@@ -19,7 +19,8 @@ class Instruction:
 
 class Program:
     def __init__(self):
-        self.address = 0
+
+        self.address = 1
         self.accumulator = 0
         self.instructions = []
         self.visited_addresses = []
@@ -48,11 +49,11 @@ class Program:
 
     def load_instructions(self, file: str):
         self.instructions = []
-        for line in read_lines(file):
+        for i, line in enumerate(read_lines(file), start=1):
             self.instructions.append(Instruction.from_text(text=line))
 
     def reset(self):
-        self.address = 0
+        self.address = 1
         self.accumulator = 0
         self.visited_addresses = []
 

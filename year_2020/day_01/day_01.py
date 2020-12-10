@@ -1,10 +1,9 @@
 import math
 import sys
-from itertools import combinations
-from typing import List, Tuple
 
 from utils.input_file import file_path_from_args
 from utils.math_utils import find_terms
+from utils.print_fn import print
 from utils.read_lines import read_lines
 
 

@@ -2,6 +2,7 @@ import sys
 from typing import List
 
 from utils.input_file import file_path_from_args
+from utils.print_fn import print
 from utils.read_lines import read_lines
 
 
