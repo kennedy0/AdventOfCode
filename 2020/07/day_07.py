@@ -7,6 +7,7 @@ from collections import namedtuple
 from typing import List
 
 from utils.input_file import file_path_from_args
+from utils.memoize import memoize
 from utils.read_lines import read_lines
 from utils.timer import Timer
 
@@ -79,6 +80,7 @@ def main(input_file: str) -> int:
     return 0
 
 
+@memoize
 def can_contain(bag: Bag, name: str) -> bool:
     for contents in bag.contains:  # type: Contents
         if contents.name == name:
