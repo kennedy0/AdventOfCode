@@ -1,6 +1,5 @@
 from __future__ import annotations
 import sys
-import time
 from collections import defaultdict
 
 from utils.input_file import file_path_from_args
