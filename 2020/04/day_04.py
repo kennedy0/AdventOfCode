@@ -84,7 +84,7 @@ class Passport:
             return False
 
         for char in color:
-            if char not in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]:
+            if char not in "0123456789abcdef":
                 return False
 
         return True

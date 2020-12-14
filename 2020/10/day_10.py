@@ -5,7 +5,6 @@ from collections import defaultdict
 from utils.input_file import file_path_from_args
 from utils.memoize import memoize
 from utils.read_lines import read_lines
-from utils.timer import Timer
 
 ADAPTERS = [0]
 
@@ -17,8 +16,7 @@ def main(input_file: str) -> int:
 
     find_differences()
 
-    with Timer():
-        combinations = find_combinations()
+    combinations = find_combinations()
     print(f"Total adapter arrangements:  {combinations}")
 
     return 0

@@ -5,7 +5,6 @@ from typing import List
 
 from utils.input_file import file_path_from_args
 from utils.read_lines import read_lines
-from utils.timer import Timer
 
 
 class State(Enum):
@@ -86,26 +85,26 @@ class Grid:
                 yield cell
 
     def advance_round(self, neighbors_tolerated: int, search_method: str):
-        to_be_occupied = []
-        to_be_emptied = []
+        new_rows = []
+        for row in self.rows:
+            new_row = []
+            for cell in row:
+                if search_method == "neighbors":
+                    neighbor_states = [c.state for c in self.get_surrounding(cell)]
+                elif search_method == "line of sight":
+                    neighbor_states = [c.state for c in self.get_line_of_sight(cell)]
+                else:
+                    raise NotImplementedError(search_method)
 
-        for cell in self.cells():
-            if search_method == "neighbors":
-                neighbor_states = [c.state for c in self.get_surrounding(cell)]
-            elif search_method == "line of sight":
-                neighbor_states = [c.state for c in self.get_line_of_sight(cell)]
-            else:
-                raise NotImplementedError(search_method)
+                if cell.state == State.Empty and State.Occupied not in neighbor_states:
+                    new_row.append(Cell(cell.x, cell.y, State.Occupied))
+                elif cell.state == State.Occupied and neighbor_states.count(State.Occupied) > neighbors_tolerated:
+                    new_row.append(Cell(cell.x, cell.y, State.Empty))
+                else:
+                    new_row.append(cell)
+            new_rows.append(new_row)
 
-            if cell.state == State.Empty and State.Occupied not in neighbor_states:
-                to_be_occupied.append(cell)
-            elif cell.state == State.Occupied and neighbor_states.count(State.Occupied) > neighbors_tolerated:
-                to_be_emptied.append(cell)
-
-        for cell in to_be_occupied:
-            cell.state = State.Occupied
-        for cell in to_be_emptied:
-            cell.state = State.Empty
+        self.rows = new_rows
 
 
 class Cell:
@@ -120,10 +119,8 @@ class Cell:
 
 def main(input_file: str) -> int:
     grid = Grid(file=input_file)
-    with Timer():
-        stabilize(grid=grid, leave_at=4, search_method="neighbors")
-    with Timer():
-        stabilize(grid=grid, leave_at=5, search_method="line of sight")
+    stabilize(grid=grid, leave_at=4, search_method="neighbors")
+    stabilize(grid=grid, leave_at=5, search_method="line of sight")
     return 0
 
 
