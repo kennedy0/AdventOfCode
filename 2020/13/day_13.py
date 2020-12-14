@@ -77,10 +77,11 @@ def find_consecutive_schedule(ids: List):
     # For each bus ID in the schedule, find the place where its schedule lines up
     for offset, id_ in schedule:
         while True:
-            if (t + offset) % id_ == 0:
-                # At time `t` (plus the offset),
+            if wait_time(time=t+offset, id_=id_) == 0:
+                # At time `t` (plus the offset), check if the bus will depart.
                 break
             else:
+                # Otherwise, increment `t` by the step value and check the next number
                 t += step
         step *= id_
 
