@@ -1,10 +1,10 @@
 from __future__ import annotations
 import sys
-from typing import Generator, List, Tuple
+from copy import deepcopy
+from typing import Generator, Tuple
 
 from utils.input_file import file_path_from_args
 from utils.read_lines import read_lines
-from utils.timer import Timer
 
 
 EMPTY = "L"
@@ -67,13 +67,11 @@ class Grid:
 
 
 def main(input_file: str) -> int:
-    grid = Grid(input_file=input_file)
-    with Timer():
-        stabilize(grid=grid, skip_floor=False, occupied_threshold=4)
+    grid_1 = Grid(input_file=input_file)
+    grid_2 = deepcopy(grid_1)
 
-    grid = Grid(input_file=input_file)
-    with Timer():
-        stabilize(grid=grid, skip_floor=True, occupied_threshold=5)
+    stabilize(grid=grid_1, skip_floor=False, occupied_threshold=4)
+    stabilize(grid=grid_2, skip_floor=True, occupied_threshold=5)
 
     return 0
 
@@ -100,7 +98,8 @@ def stabilize(grid: Grid, skip_floor: bool, occupied_threshold: int):
                     grid.set_seat(x=i, y=j, state=EMPTY)
                     stabilized = False
         grid.update()
-    print(f"Seats stabilized after {num_rounds} rounds. {grid.occupied} seats are occupied")
+
+    print(f"Seats stabilized after {num_rounds} rounds with {grid.occupied} occupied seats. (Skip floor: {skip_floor})")
 
 
 if __name__ == "__main__":
