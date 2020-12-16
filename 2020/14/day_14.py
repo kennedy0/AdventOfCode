@@ -1,6 +1,6 @@
 import sys
 from collections import defaultdict
-from typing import Generator, List, Tuple
+from typing import Generator, Tuple
 
 from utils.input_file import file_path_from_args
 from utils.read_lines import read_lines
