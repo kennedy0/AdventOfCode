@@ -1,6 +1,5 @@
 import re
 import sys
-from typing import Any, AnyStr, Dict, List, Tuple
 
 from utils.input_file import file_path_from_args
 from utils.read_lines import read_lines
