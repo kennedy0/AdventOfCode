@@ -47,14 +47,22 @@ def rule_to_re(rule: str) -> str:
         elif part in ["8", "11"] and part in [r.strip("\" ") for r in RULES[part].split(" ")]:
             # part 2 loops
             if part == "8":
+                # 42+
                 part_sub = rule_to_re(rule='42')
                 rule_str += f"(?:{part_sub})+"
             elif part == "11":
+                # 42{1}31{1}|42{2}31{2}|...|42{n}31{n}
+                # Hacky but it works.
                 part_sub_42 = rule_to_re(rule='42')
-                rule_str_42 = f"(?:{part_sub_42})+"
+                rule_str_42 = f"(?:{part_sub_42})"
                 part_sub_31 = rule_to_re(rule='31')
-                rule_str_31 = f"(?:{part_sub_31})+"
-                rule_str += f"{rule_str_42}{rule_str_31}"
+                rule_str_31 = f"(?:{part_sub_31})"
+                a = []
+                for x in range(1, 10):
+                    part_sub = f"(?:{rule_str_42}{{{str(x)}}}{rule_str_31}{{{str(x)}}})"
+                    a.append(part_sub)
+                aa = "|".join(a)
+                rule_str += f"(?:{aa})"
         else:
             part_sub = rule_to_re(rule=RULES[part])
             rule_str += f"(?:{part_sub})"
