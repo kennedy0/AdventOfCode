@@ -106,14 +106,18 @@ def main(input_file: str) -> int:
     # Part 2
     combined = combine_tiles(tiles=locked_tiles)
     for x in range(8):
-        count = find_sea_monsters(image=combined.image)
-        if count > 0:
-            print(f"Found {count} sea monsters.")
+        num_sea_monsters = count_sea_monsters(image=combined.image)
+        if num_sea_monsters > 0:
+            print(f"Found {num_sea_monsters} sea monsters.")
             break
         combined.rotate()
         if x in [3, 7]:
             combined.flip()
 
+    combined_pixel_count = "".join(combined.image).count("#")
+    sea_monster_pixel_count = "".join(SEA_MONSTER).count("#") * num_sea_monsters
+    water_roughness = combined_pixel_count - sea_monster_pixel_count
+    print(f"Water roughness is {water_roughness}.")
     return 0
 
 
@@ -137,6 +141,9 @@ def get_tiles(file: str) -> List[Tile]:
 
 
 def try_to_link(tiles: List[Tile], tile: Tile):
+    """ Try to link a tile with existing tiles.
+    Once a link is made, the tile is locked, and can't be rotated/flipped.
+    """
     linked = False
     for other_tile in tiles:
         for x in range(8):
@@ -172,18 +179,57 @@ def find_corners(tiles: List[Tile]):
 
 
 def combine_tiles(tiles: List[Tile]) -> Tile:
+    # Start with top-left tile
     for tile in tiles:
         if tile.north is None and tile.west is None:
             top_left = tile
 
-    image = []
+    # Build new image that is the combined size of all tiles (minus 2 for the stripped border)
+    tile_size = len(top_left.image) - 2
+    tile_rows = int(math.sqrt(len(tiles)))
+    image = ["" for _ in range(tile_rows * tile_size)]
+
+    # Iterate over each tile (left>right, top>bottom), building the final image.
+    row_start = top_left
+    tile = top_left
+    row_offset = 0
+    for _ in range(len(tiles)):
+        for i, row in enumerate(tile.image[1:-1]):
+            image[i+row_offset] += row[1:-1]
+        if tile.east is not None:
+            tile = tile.east
+        else:
+            row_offset += tile_size
+            tile = row_start.south
+            row_start = tile
 
     return Tile(name="combined", image=image)
 
 
-def find_sea_monsters(image: List[str]) -> int:
+def count_sea_monsters(image: List[str]) -> int:
     count = 0
+    sea_monster_width = len(SEA_MONSTER[0])
+    sea_monster_height = len(SEA_MONSTER)
+    image_size = len(image)
+
+    # Slide SEA_MONSTER kernel across image to look for matches.
+    for j in range(image_size-sea_monster_height):
+        for i in range(image_size-sea_monster_width):
+            image_slice = [row[i:i+sea_monster_width] for row in image[j:j+sea_monster_height]]
+            if find_sea_monster(image_slice=image_slice):
+                count += 1
     return count
+
+
+def find_sea_monster(image_slice: List[str]) -> bool:
+    """ Compare pixels in an image slice against the SEA_MONSTER to see if it's a match. """
+    # Flatten sea monster and image slice into 1d array for easier comparison.
+    sea_monster = "".join(SEA_MONSTER)
+    image = "".join(image_slice)
+    for i, pixel in enumerate(sea_monster):
+        if pixel == "#" and image[i] != "#":
+            return False
+    return True
 
 
 if __name__ == "__main__":
